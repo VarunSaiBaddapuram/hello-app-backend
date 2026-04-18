@@ -53,7 +53,7 @@ app.get('/test', (req, res) => {
 });
 
 // App Routes
-app.use('/', routes);
+app.use('/api', routes);
 
 // Global Error Handler Middleware
 app.use((err, req, res, next) => {

@@ -3,7 +3,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const jwtSecret = process.env.JWT_SECRET;
-const cookieConfig = { sameSite: 'lax', secure: false, httpOnly: true };
+const isProduction = process.env.NODE_ENV === 'production';
+const cookieConfig = { 
+  sameSite: isProduction ? 'none' : 'lax', 
+  secure: isProduction, 
+  httpOnly: true,
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+};
 
 exports.register = async (req, res, next) => {
   const { username, password } = req.body;
