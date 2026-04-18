@@ -14,6 +14,7 @@ const { apiLimiter } = require('./middlewares/rateLimiter');
 connectDB();
 
 const app = express();
+app.set('trust proxy', 1); // Required for Render/Load Balancers to handle cookies correctly
 
 // Security Middlewares
 app.use(helmet()); // Set security headers
@@ -42,9 +43,10 @@ app.get('/ping', (req, res) => {
 app.get('/api/verify', (req, res) => {
   res.status(200).json({ message: 'API Prefix OK', timestamp: new Date().toISOString() });
 });
-
+// for redeploy purpose added this comment
 // System Health Monitor
 app.get('/health', (req, res) => {
+
   res.json({
     status: 'healthy',
     uptime: process.uptime(),

@@ -3,13 +3,20 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const jwtSecret = process.env.JWT_SECRET;
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || !!process.env.RENDER;
+
 const cookieConfig = { 
-  sameSite: isProduction ? 'none' : 'lax', 
-  secure: isProduction, 
+  sameSite: 'none', // Set to none + secure for cross-domain usage in production
+  secure: true, 
   httpOnly: true,
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 };
+
+// For local development, allow lax/non-secure cookies
+if (!isProduction) {
+  cookieConfig.sameSite = 'lax';
+  cookieConfig.secure = false;
+}
 
 exports.register = async (req, res, next) => {
   const { username, password } = req.body;
