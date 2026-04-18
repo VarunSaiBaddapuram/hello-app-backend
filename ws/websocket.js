@@ -76,10 +76,21 @@ const setupWebSocket = (server) => {
     }
 
     connection.on('message', async (message) => {
-      if (!connection.isAuthenticated) return;
-
+      // Message-based heartbeat (Ping/Pong)
+      // This helps keep connections alive through proxies/load-balancers (like Render's)
       try {
         const messageData = JSON.parse(message.toString());
+        
+        if (messageData.type === 'ping') {
+          connection.send(JSON.stringify({ type: 'pong' }));
+          return;
+        }
+
+        if (!connection.isAuthenticated) {
+          logger.warn(`Unauthenticated message attempt from: ${req.socket.remoteAddress}`);
+          return;
+        }
+
         const { recipient, text, file } = messageData;
 
         // Security: Prevent extremely large payloads (Bombing/OOM attack)

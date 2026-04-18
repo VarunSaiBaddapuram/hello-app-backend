@@ -27,11 +27,16 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
   credentials: true,
-  origin: process.env.CLIENT_URL,
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
 }));
 
 // Rate Limiting for all API routes
 app.use(apiLimiter);
+
+// UptimeRobot / Ping Service Endpoint
+app.get('/ping', (req, res) => {
+  res.status(200).send('pong');
+});
 
 // System Health Monitor
 app.get('/health', (req, res) => {
