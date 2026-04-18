@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
   credentials: true,
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: process.env.CLIENT_URL,
 }));
 
 // Rate Limiting for all API routes
@@ -36,6 +36,11 @@ app.use(apiLimiter);
 // UptimeRobot / Ping Service Endpoint
 app.get('/ping', (req, res) => {
   res.status(200).send('pong');
+});
+
+// Diagnostic route for API prefix verification
+app.get('/api/verify', (req, res) => {
+  res.status(200).json({ message: 'API Prefix OK', timestamp: new Date().toISOString() });
 });
 
 // System Health Monitor
@@ -58,10 +63,10 @@ app.use('/api', routes);
 // Global Error Handler Middleware
 app.use((err, req, res, next) => {
   logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-  
+
   const status = err.status || 500;
   const message = err.message || 'Internal Server Error';
-  
+
   res.status(status).json({
     error: {
       message: message,
